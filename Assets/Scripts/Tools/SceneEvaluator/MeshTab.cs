@@ -22,12 +22,12 @@ namespace Tools
         {
             base.Draw();
             // Here we draw the GUI for the filter options
-            ignoreMeshRenderers = EditorGUILayout.ToggleLeft("Ignore Mesh Renderers", ignoreMeshRenderers);
-            ignoreSkinnedMeshRenderers = EditorGUILayout.ToggleLeft("Ignore Skinned Mesh Renderers", ignoreSkinnedMeshRenderers);
-            checkVertexCount = EditorGUILayout.BeginToggleGroup("Vertex count", checkVertexCount);
-            vertexCountValue = EditorGUILayout.IntSlider(vertexCountValue, 0, int.MaxValue);
+            ignoreMeshRenderers = EditorGUILayout.ToggleLeft(new GUIContent("Ignore Mesh Renderers", "Do not check Mesh Renderers agains the criteria"), ignoreMeshRenderers);
+            ignoreSkinnedMeshRenderers = EditorGUILayout.ToggleLeft(new GUIContent("Ignore Skinned Mesh Renderers", "Do not check Skinned Mesh Renderers agains the criteria"), ignoreSkinnedMeshRenderers);
+            checkVertexCount = EditorGUILayout.BeginToggleGroup(new GUIContent("Vertex Check", "Toggle this to check the vertex count of meshes"), checkVertexCount);
+            vertexCountValue = EditorGUILayout.IntSlider(new GUIContent("Vertex Count", "Mesh vertex count with more than this value will be filtered"), vertexCountValue, 0, int.MaxValue);
             EditorGUILayout.EndToggleGroup();
-            checkMaterialCount = EditorGUILayout.ToggleLeft("Has more than one material", checkMaterialCount);
+            checkMaterialCount = EditorGUILayout.ToggleLeft(new GUIContent("Material Check", "Check if renderers have more than one material"), checkMaterialCount);
         }
 
         public override void Scan()

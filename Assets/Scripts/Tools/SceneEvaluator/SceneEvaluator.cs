@@ -73,7 +73,7 @@ namespace Tools
                 activeTab.Draw();
 
                 // Then we draw the individual items that failed the validation check
-                EditorGUILayout.BeginScrollView(scroll, EditorStyles.helpBox);
+                scroll = EditorGUILayout.BeginScrollView(scroll, EditorStyles.helpBox);
                 for (int i = 0; i < activeTab.criteriaMatches.Count; i++)
                 {
                     ListEntry entry = activeTab.criteriaMatches[i];

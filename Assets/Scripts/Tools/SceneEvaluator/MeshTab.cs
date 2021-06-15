@@ -36,39 +36,32 @@ namespace Tools
 
             foreach (GameObject gameObject in GetGameObjects())
             {
-                if (!ignoreMeshRenderers)
+                // Get all the Renderers on this object and its child objects
+                Renderer[] renderers = gameObject.GetComponentsInChildren<Renderer>(true);
+                // check each against the criteria
+                foreach (Renderer renderer in renderers)
                 {
-                    // Get all the MeshRenderers on this object and its child objects
-                    MeshRenderer[] meshRenderers = gameObject.GetComponentsInChildren<MeshRenderer>(true);
-                    // check each against the criteria
-                    foreach (MeshRenderer meshRenderer in meshRenderers)
+                    // Skip if we should ignore the renderer type
+                    if ((ignoreMeshRenderers && renderer is MeshRenderer) || (ignoreSkinnedMeshRenderers && renderer is SkinnedMeshRenderer)) continue;
+
+                    List<string> errors = new List<string>();
+
+                    if (renderer is MeshRenderer) CheckIfComponentExists<MeshFilter>(renderer.gameObject, errors);
+
+
+                    foreach (Object obj in CollectDependanciesRecursive(renderer.gameObject, new List<System.Type> { typeof(MeshFilter), typeof(SkinnedMeshRenderer) }, new Dictionary<int, Object>()))
                     {
-                        List<string> errors = new List<string>();
-
-                        MeshFilter meshFilter = CheckIfComponentExists<MeshFilter>(meshRenderer.gameObject, errors);
-                        if (meshFilter != null) CheckVertexCount(meshFilter.sharedMesh, errors);
-                        CheckMaterialCount(meshRenderer, errors);
-
-                        // If any of the checks were fulfilled we add a entry to the match list
-                        if (errors.Count > 0) AddCriteriaMatch(meshRenderer.gameObject, errors);
+                        if (obj is Mesh)
+                        {
+                            Mesh mesh = obj as Mesh;
+                            CheckVertexCount(renderer, mesh, errors);
+                        }
                     }
-                }
 
-                if (!ignoreSkinnedMeshRenderers)
-                {
-                    // Get all the SkinnedMeshRenderers on this object and its child objects
-                    SkinnedMeshRenderer[] skinnedMeshRenderers = gameObject.GetComponentsInChildren<SkinnedMeshRenderer>(true);
-                    // check each against the criteria
-                    foreach (SkinnedMeshRenderer skinnedMeshRenderer in skinnedMeshRenderers)
-                    {
-                        List<string> errors = new List<string>();
+                    CheckMaterialCount(renderer, errors);
 
-                        CheckVertexCount(skinnedMeshRenderer.sharedMesh, errors);
-                        CheckMaterialCount(skinnedMeshRenderer, errors);
-
-                        // If any of the checks were fulfilled we add a entry to the match list
-                        if (errors.Count > 0) AddCriteriaMatch(skinnedMeshRenderer.gameObject, errors);
-                    }
+                    // If any of the checks were fulfilled we add a entry to the match list
+                    if (errors.Count > 0) AddCriteriaMatch(renderer.gameObject, errors);
                 }
             }
         }
@@ -94,10 +87,10 @@ namespace Tools
         /// Check if the mesh passed in exsists, and adds a error message if it does not.
         /// If the mesh exists then check the vertex count
         /// </summary>
-        private void CheckVertexCount (Mesh mesh, List<string> errors)
+        private void CheckVertexCount (Renderer renderer, Mesh mesh, List<string> errors)
         {
-            if (mesh == null) errors.Add($"No Mesh assigned.");
-            else if (checkVertexCount && mesh.vertexCount > vertexCountValue) errors.Add($"Vertex count of {mesh.vertexCount} exceeds {vertexCountValue}");
+            if (mesh == null) errors.Add($"No Mesh assigned for {renderer.GetType().Name}.");
+            else if (checkVertexCount && mesh.vertexCount > vertexCountValue) errors.Add($"{renderer.gameObject.name} - {renderer.GetType().Name} - Vertex count of {mesh.vertexCount} exceeds {vertexCountValue} on {mesh.name}");
         }
 
         /// <summary>

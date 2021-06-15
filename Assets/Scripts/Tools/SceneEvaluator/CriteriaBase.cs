@@ -10,8 +10,17 @@ namespace Tools
 {
     public abstract class CriteriaBase : ICriteria
     {
+        /// <summary>
+        /// Gets the criteria value on the spesified game object
+        /// Child classes responsable for implementation
+        /// </summary>
+        /// <returns>A Tuple where the first value is the criteria value and the second is the responsable object</returns>
         public abstract System.Tuple<object, Object> GetValue(GameObject gameObject);
 
+        /// <summary>
+        /// Check if value is valid accoriding to criteria implementation
+        /// validation errors can be logged
+        /// </summary>
         public abstract bool Validate(GameObject gameObject, ref List<string> errors);
 
         /// <summary>

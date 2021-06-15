@@ -11,7 +11,7 @@ namespace Tools
     public class SceneEvaluator : EditorWindow
     {
         private int tabIndex = -1;
-        private CatagoryTabBase activeTab;
+        private CategoryTabBase activeTab;
         private static SortedList<string, System.Type> tabs = new SortedList<string, System.Type>();
 
         private Vector2 scroll = Vector2.zero;
@@ -28,8 +28,8 @@ namespace Tools
 
         void OnEnable()
         {
-            // When the window is enabled we check for any classes that has the ICatagoryTab interface
-            FindControllers<ICatagoryTab, CatagoryTabBase>(ref tabs);
+            // When the window is enabled we check for any classes that has the IcategoryTab interface
+            FindControllers<ICategoryTab, CategoryTabBase>(ref tabs);
         }
 
         static void FindControllers<I, T>(ref SortedList<string, Type> collection)
@@ -42,7 +42,7 @@ namespace Tools
                     System.Type[] types = assembly.GetTypes();
                     foreach (System.Type type in types)
                     {
-                        // We check through the unity assemblies for any types that has the ICatagoryTab interface and inherits from CatagoryTabBase to add as catagory tabs in the editor window
+                        // We check through the unity assemblies for any types that has the IcategoryTab interface and inherits from categoryTabBase to add as category tabs in the editor window
                         if (!collection.ContainsKey(type.Name) && type.GetInterfaces().Contains(typeof(I)) && type.BaseType.Equals(typeof(T)))
                         {
                             collection.Add(type.Name.Replace("Tab", ""), type);
@@ -60,14 +60,15 @@ namespace Tools
         {
             EditorGUILayout.LabelField("Scene Evaluator", EditorStyles.boldLabel);
 
-            // We display the tabs and create a instance of the catagory tab controller when a tab is selected
+            // We display the tabs and create a instance of the category tab controller when a tab is selected
             EditorGUI.BeginChangeCheck();
             tabIndex = GUILayout.SelectionGrid(tabIndex, tabs.Keys.ToArray<string>(), tabs.Count);
             if (EditorGUI.EndChangeCheck())
             {
-                activeTab = System.Activator.CreateInstance(tabs.Values[tabIndex]) as CatagoryTabBase;
+                activeTab = System.Activator.CreateInstance(tabs.Values[tabIndex]) as CategoryTabBase;
             }
 
+            // Button to export criteria values for select game objects
             if (GUILayout.Button("Export Selected"))
             {
                 ExportToCSV();

@@ -17,6 +17,7 @@ namespace Tools {
                 if (obj is Shader)
                 {
                     Shader shader = obj as Shader;
+                    // We get the shader name
                     return new System.Tuple<object, Object> (shader.name, shader);
                 }
             }
@@ -25,14 +26,18 @@ namespace Tools {
 
         public override bool Validate(GameObject gameObject, ref List<string> errors)
         {
+            // Extract the values
             System.Tuple<object, Object> value = GetValue(gameObject);
             Shader shader = value.Item2 as Shader;
+
             bool result;
+            // Validate the values
             if (shader.name == shaderName) 
                 result = false;
             else
                 result = true;
 
+            //add a validation error if nessisary
             if (errors != null && !result) errors.Add($"Found {shaderName} shader on {gameObject.name}");
 
             return result;

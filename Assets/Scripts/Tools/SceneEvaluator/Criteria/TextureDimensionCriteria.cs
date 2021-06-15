@@ -16,6 +16,7 @@ namespace Tools {
                 if (obj is Texture)
                 {
                     Texture texture = obj as Texture;
+                    // We check whether the width or hight is the highest, and use the higher value
                     return new System.Tuple<object, Object> (Mathf.Max(texture.width, texture.height), texture);
                 }
             }
@@ -24,15 +25,19 @@ namespace Tools {
 
         public override bool Validate(GameObject gameObject, ref List<string> errors)
         {
+            // Extract the values
             System.Tuple<object, Object> value = GetValue(gameObject);
             Texture texture = value.Item2 as Texture;
             int biggestDimension = (int)value.Item1;
+
             bool result;
+            // Validate the values
             if (biggestDimension > textureDimension)
                 result = false;
             else
                 result = true;
 
+            //add a validation error if nessisary
             if (errors != null && !result) errors.Add($"{texture.name} {texture.width}x{texture.height} Texture dimentions exceeds {textureDimension}");
 
             return result;

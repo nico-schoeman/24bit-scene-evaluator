@@ -16,6 +16,7 @@ namespace Tools {
                 if (obj is Mesh)
                 {
                     Mesh mesh = obj as Mesh;
+                    // Get the mesh's vertex count
                     return new System.Tuple<object, Object>(mesh.vertexCount, mesh);
                 }
             }
@@ -24,15 +25,19 @@ namespace Tools {
 
         public override bool Validate(GameObject gameObject, ref List<string> errors)
         {
+            // Extract the values
             System.Tuple<object, Object> value = GetValue(gameObject);
             Mesh mesh = value.Item2 as Mesh;
             int vertexCount = (int)value.Item1;
+
             bool result;
+            // Validate the values
             if (vertexCount > vertexCountValue)
                 result = false;
             else
                 result = true;
 
+            //add a validation error if nessisary
             if (errors != null && !result) errors.Add($"{gameObject.name} - {mesh.name} - Vertex count of {vertexCount} exceeds {vertexCountValue}");
 
             return result;

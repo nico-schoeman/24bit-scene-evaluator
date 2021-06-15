@@ -9,9 +9,9 @@ namespace Tools
     /// <summary>
     /// This class defines the Mesh tab and it's checks as well as draws the tab specific GUI parts
     /// </summary>
-    public class MeshTab : CatagoryTabBase
+    public class MeshTab : CategoryTabBase
     {
-        // The user defined criteria options are stored here
+        // The criteria options are defined here
         private VertexCountCriteria vertexCountCriteria = new VertexCountCriteria();
         private MaterialCountCriteria materialCountCriteria = new MaterialCountCriteria();
 
@@ -26,9 +26,11 @@ namespace Tools
             // Here we draw the GUI for the filter options
             ignoreMeshRenderers = EditorGUILayout.ToggleLeft(new GUIContent("Ignore Mesh Renderers", "Do not check Mesh Renderers agains the criteria"), ignoreMeshRenderers);
             ignoreSkinnedMeshRenderers = EditorGUILayout.ToggleLeft(new GUIContent("Ignore Skinned Mesh Renderers", "Do not check Skinned Mesh Renderers agains the criteria"), ignoreSkinnedMeshRenderers);
+           
             checkVertexCount = EditorGUILayout.BeginToggleGroup(new GUIContent("Vertex Check", "Toggle this to check the vertex count of meshes"), checkVertexCount);
             vertexCountCriteria.vertexCountValue = EditorGUILayout.IntSlider(new GUIContent("Vertex Count", "Mesh vertex count with more than this value will be filtered"), vertexCountCriteria.vertexCountValue, 0, int.MaxValue);
             EditorGUILayout.EndToggleGroup();
+
             checkMaterialCount = EditorGUILayout.ToggleLeft(new GUIContent("Material Check", "Check if renderers have more than one material"), checkMaterialCount);
         }
 
@@ -48,8 +50,10 @@ namespace Tools
 
                     List<string> errors = new List<string>();
 
+                    // additional validation to check if there is a MeshFilter attached
                     if (renderer is MeshRenderer) CheckIfComponentExists<MeshFilter>(renderer.gameObject, errors);
 
+                    // run the appropriate criteria validations depending on filter options selected
                     if (checkVertexCount) vertexCountCriteria.Validate(renderer.gameObject, ref errors);
                     if (checkMaterialCount) materialCountCriteria.Validate(renderer.gameObject, ref errors);
 

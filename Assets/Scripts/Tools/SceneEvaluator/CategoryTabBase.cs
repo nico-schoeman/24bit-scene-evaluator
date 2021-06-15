@@ -8,9 +8,9 @@ using System.Linq;
 namespace Tools
 {
     /// <summary>
-    /// this is the base class for our catagories and it implements the shared functionality for the catagory tabs
+    /// this is the base class for our catagories and it implements the shared functionality for the category tabs
     /// </summary>
-    public abstract class CatagoryTabBase : ICatagoryTab
+    public abstract class CategoryTabBase : ICategoryTab
     {
         public string Name
         {
@@ -20,12 +20,12 @@ namespace Tools
         public List<ListEntry> criteriaMatches = new List<ListEntry>();
 
         /// <summary>
-        /// This method is responsible to check the GameObjects in the scene against the criteria defined in the catagory controllers
+        /// This method is responsible to check the GameObjects in the scene against the criteria defined in the category controllers
         /// </summary>
         public abstract void Scan();
 
         /// <summary>
-        /// Draws the generic GUI that the catagory controllers share
+        /// Draws the generic GUI that the category controllers share
         /// </summary>
         public virtual void Draw()
         {

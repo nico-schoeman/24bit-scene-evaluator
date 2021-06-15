@@ -12,11 +12,13 @@ namespace Tools
     public class MeshTab : CatagoryTabBase
     {
         // The user defined criteria options are stored here
+        private VertexCountCriteria vertexCountCriteria = new VertexCountCriteria();
+        private MaterialCountCriteria materialCountCriteria = new MaterialCountCriteria();
+
         private bool ignoreMeshRenderers;
         private bool ignoreSkinnedMeshRenderers;
         private bool checkMaterialCount;
         private bool checkVertexCount;
-        private int vertexCountValue;
 
         public override void Draw()
         {
@@ -25,7 +27,7 @@ namespace Tools
             ignoreMeshRenderers = EditorGUILayout.ToggleLeft(new GUIContent("Ignore Mesh Renderers", "Do not check Mesh Renderers agains the criteria"), ignoreMeshRenderers);
             ignoreSkinnedMeshRenderers = EditorGUILayout.ToggleLeft(new GUIContent("Ignore Skinned Mesh Renderers", "Do not check Skinned Mesh Renderers agains the criteria"), ignoreSkinnedMeshRenderers);
             checkVertexCount = EditorGUILayout.BeginToggleGroup(new GUIContent("Vertex Check", "Toggle this to check the vertex count of meshes"), checkVertexCount);
-            vertexCountValue = EditorGUILayout.IntSlider(new GUIContent("Vertex Count", "Mesh vertex count with more than this value will be filtered"), vertexCountValue, 0, int.MaxValue);
+            vertexCountCriteria.vertexCountValue = EditorGUILayout.IntSlider(new GUIContent("Vertex Count", "Mesh vertex count with more than this value will be filtered"), vertexCountCriteria.vertexCountValue, 0, int.MaxValue);
             EditorGUILayout.EndToggleGroup();
             checkMaterialCount = EditorGUILayout.ToggleLeft(new GUIContent("Material Check", "Check if renderers have more than one material"), checkMaterialCount);
         }
@@ -48,17 +50,8 @@ namespace Tools
 
                     if (renderer is MeshRenderer) CheckIfComponentExists<MeshFilter>(renderer.gameObject, errors);
 
-
-                    foreach (Object obj in CollectDependanciesRecursive(renderer.gameObject, new List<System.Type> { typeof(MeshFilter), typeof(SkinnedMeshRenderer) }, new Dictionary<int, Object>()))
-                    {
-                        if (obj is Mesh)
-                        {
-                            Mesh mesh = obj as Mesh;
-                            CheckVertexCount(renderer, mesh, errors);
-                        }
-                    }
-
-                    CheckMaterialCount(renderer, errors);
+                    if (checkVertexCount) vertexCountCriteria.Validate(renderer.gameObject, ref errors);
+                    if (checkMaterialCount) materialCountCriteria.Validate(renderer.gameObject, ref errors);
 
                     // If any of the checks were fulfilled we add a entry to the match list
                     if (errors.Count > 0) AddCriteriaMatch(renderer.gameObject, errors);
@@ -81,24 +74,6 @@ namespace Tools
                 errors.Add($"No {typeof(T).Name} on gameObject.");
             }
             return component;
-        }
-
-        /// <summary>
-        /// Check if the mesh passed in exsists, and adds a error message if it does not.
-        /// If the mesh exists then check the vertex count
-        /// </summary>
-        private void CheckVertexCount (Renderer renderer, Mesh mesh, List<string> errors)
-        {
-            if (mesh == null) errors.Add($"No Mesh assigned for {renderer.GetType().Name}.");
-            else if (checkVertexCount && mesh.vertexCount > vertexCountValue) errors.Add($"{renderer.gameObject.name} - {renderer.GetType().Name} - Vertex count of {mesh.vertexCount} exceeds {vertexCountValue} on {mesh.name}");
-        }
-
-        /// <summary>
-        /// Check if there are more than one material on the given renderer and adds a error message if there are.
-        /// </summary>
-        private void CheckMaterialCount (Renderer renderer, List<string> errors)
-        {
-            if (checkMaterialCount && renderer.sharedMaterials.Length > 1) errors.Add($"{renderer.GetType().Name} Has {renderer.sharedMaterials.Length} materials");
         }
     }
 }

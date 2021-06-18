@@ -17,8 +17,11 @@ namespace Tools
         private Vector2 _scroll = Vector2.zero;
         private static SceneEvaluator s_window;
 
-        // Add menu named "SceneEvaluator" to the Window menu
-        [MenuItem("24Bit Tools/SceneEvaluator %e")] //Hotkey is Ctrl-E
+        /// <summary>
+        /// Add menu option named "SceneEvaluator" to the Window menu that creates/gets the editor window
+        /// Hotkey is Ctrl-E
+        /// </summary>
+        [MenuItem("24Bit Tools/SceneEvaluator %e")]
         public static void Init()
         {
             // Get existing open window or if none, make a new one:
@@ -32,6 +35,12 @@ namespace Tools
             FindControllers<ICategoryTab, CategoryTabBase>(ref _tabs);
         }
 
+        /// <summary>
+        /// Dynamically find the Types that implement interface <see cref="I"/> and inherits from <see cref="T"/>
+        /// </summary>
+        /// <typeparam name="I">The interface</typeparam>
+        /// <typeparam name="T">The inherited base class</typeparam>
+        /// <param name="collection">A ref to the collection of types found</param>
         private static void FindControllers<I, T>(ref SortedList<string, Type> collection)
         {
             try
@@ -141,7 +150,7 @@ namespace Tools
                     data.Add(value == "-1" || string.IsNullOrWhiteSpace(value) ? "NAN" : value);
                 }
 
-                // comma sepperate the data and write the line
+                // Comma separate the data and write the line
                 string line = string.Join(",", data);
                 sw.WriteLine(line);
             }

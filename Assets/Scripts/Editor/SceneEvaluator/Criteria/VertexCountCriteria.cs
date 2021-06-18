@@ -32,7 +32,7 @@ namespace Tools
             // Validate the values
             bool result = vertexCount <= VertexCountValue;
 
-            //add a validation error if nessisary
+            // Add a validation error if nessisary
             if (errors != null && !result) errors.Add($"{gameObject.name} - {mesh.name} - Vertex count of {vertexCount} exceeds {VertexCountValue}");
 
             return result;

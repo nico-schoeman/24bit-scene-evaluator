@@ -8,15 +8,18 @@ namespace Tools
     using UnityEngine;
 
     /// <summary>
-    /// this is the base class for our catagories and it implements the shared functionality for the category tabs
+    /// This is the base class for our catagories and it implements the shared functionality for the category tabs
     /// </summary>
     public abstract class CategoryTabBase : ICategoryTab
     {
         public List<ListEntry> CriteriaMatches { get; set; } = new List<ListEntry>();
 
+        /// <summary>
+        /// Gets the name of the current type with "Tab" removed
+        /// </summary>
         public string GetName()
         {
-            return this.GetType().Name.Replace("Tab", "");
+            return this.GetType().Name.Replace("Tab", string.Empty);
         }
 
         /// <summary>
@@ -44,8 +47,7 @@ namespace Tools
         public virtual GameObject[] GetGameObjects()
         {
             UnityEngine.SceneManagement.Scene scene = EditorSceneManager.GetActiveScene();
-            GameObject[] gameObjects = scene.GetRootGameObjects();
-            return gameObjects;
+            return scene.GetRootGameObjects();
         }
 
         /// <summary>

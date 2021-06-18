@@ -32,7 +32,7 @@ namespace Tools
             // Validate the values
             bool result = materialCount <= MaterialCountValue;
 
-            //add a validation error if nessisary
+            // Add a validation error if nessisary
             if (errors != null && !result) errors.Add($"{gameObject.name} Has {materialCount} materials assigned");
 
             return result;

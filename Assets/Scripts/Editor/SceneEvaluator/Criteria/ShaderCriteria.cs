@@ -32,7 +32,7 @@ namespace Tools
             // Validate the values
             bool result = shader?.name != ShaderName;
 
-            //add a validation error if nessisary
+            // Add a validation error if nessisary
             if (errors != null && !result) errors.Add($"Found {ShaderName} shader on {gameObject.name}");
 
             return result;

@@ -41,7 +41,7 @@ namespace Tools
             {
                 // Get all the Renderers on this object and its child objects
                 Renderer[] renderers = gameObject.GetComponentsInChildren<Renderer>(true);
-                // check each against the criteria
+                // Check each against the criteria
                 foreach (Renderer renderer in renderers)
                 {
                     // Skip if we should ignore the renderer type
@@ -49,10 +49,10 @@ namespace Tools
 
                     List<string> errors = new List<string>();
 
-                    // additional validation to check if there is a MeshFilter attached
+                    // Additional validation to check if there is a MeshFilter attached
                     if (renderer is MeshRenderer) CheckIfComponentExists<MeshFilter>(renderer.gameObject, errors);
 
-                    // run the appropriate criteria validations depending on filter options selected
+                    // Run the appropriate criteria validations depending on filter options selected
                     if (_checkVertexCount) _vertexCountCriteria.Validate(renderer.gameObject, ref errors);
                     if (_checkMaterialCount) _materialCountCriteria.Validate(renderer.gameObject, ref errors);
 
@@ -71,7 +71,8 @@ namespace Tools
         /// </returns>
         private T CheckIfComponentExists<T>(GameObject gameObject, List<string> errors) where T : Component
         {
-            T component = gameObject.GetComponent<T>(); // For some reason a generic get component returns a "null" string if none was found
+            // For some reason a generic get component returns a "null" string if none was found
+            T component = gameObject.GetComponent<T>();
             if (component == null || component.ToString() == "null")
             {
                 errors.Add($"No {typeof(T).Name} on gameObject.");

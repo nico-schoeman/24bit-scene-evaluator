@@ -56,7 +56,7 @@ namespace Tools
                 {
                     List<string> errors = new List<string>();
 
-                    // run the appropriate criteria validations depending on filter options selected
+                    // Run the appropriate criteria validations depending on filter options selected
                     if (_checkTexture) _textureDimensionCriteria.Validate(renderer.gameObject, ref errors);
                     if (_checkShader) _shaderCriteria.Validate(renderer.gameObject, ref errors);
 

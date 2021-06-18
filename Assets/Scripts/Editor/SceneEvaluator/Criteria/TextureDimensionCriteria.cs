@@ -32,7 +32,7 @@ namespace Tools
             // Validate the values
             bool result = biggestDimension <= TextureDimension;
 
-            //add a validation error if nessisary
+            // Add a validation error if nessisary
             if (errors != null && !result) errors.Add($"{texture.name} {texture.width}x{texture.height} Texture dimentions exceeds {TextureDimension}");
 
             return result;

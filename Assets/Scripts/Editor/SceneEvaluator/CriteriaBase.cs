@@ -16,15 +16,15 @@ namespace Tools
 
         /// <summary>
         /// Check if value is valid accoriding to criteria implementation
-        /// validation errors can be logged
+        /// Validation errors can be logged
         /// </summary>
         public abstract bool Validate(GameObject gameObject, ref List<string> errors);
 
         /// <summary>
         /// Find all the dependencies of the provided object.
-        /// componentTypes is a list of component types to include in the check, others will be skipped
+        /// ComponentTypes is a list of component types to include in the check, others will be skipped
         /// </summary>
-        /// <returns>list of all the dependencies that originate from the types defined in the componentTypes list</returns>
+        /// <returns>List of all the dependencies that originate from the types defined in the componentTypes list</returns>
         public static List<Object> CollectDependanciesRecursive(Object obj, List<System.Type> componentTypes, List<Object> dependencies)
         {
             // Could not get EditorUtility.CollectDependencies to work as I wanted.
@@ -37,16 +37,17 @@ namespace Tools
 
             while (property.Next(true))
             {
+                // Traverse only through components and their fields
                 if ((property.propertyType == SerializedPropertyType.ObjectReference) &&
                     (property.objectReferenceValue != null) &&
-                    (property.name != "m_PrefabParentObject") && // Don't follow prefabs
-                    (property.name != "m_PrefabInternal") && // Don't follow prefab internals
-                    (property.name != "m_Father") && // Don't navigate upwards
-                    (property.name != "m_GameObject")) // Don't go to other gameObjects
+                    (property.name != "m_PrefabParentObject") &&
+                    (property.name != "m_PrefabInternal") &&
+                    (property.name != "m_Father") &&
+                    (property.name != "m_GameObject"))
                 {
                     if (property.name == "component" && componentTypes.Contains(property.objectReferenceValue.GetType()))
                     {
-                        // if the property is one of the types in the componentTypes list, then we keep on recuring through the referance's properties
+                        // If the property is one of the types in the componentTypes list, then we keep on recuring through the referance's properties
                         CollectDependanciesRecursive(property.objectReferenceValue, componentTypes, dependencies);
                     }
                     else if (property.name != "component")

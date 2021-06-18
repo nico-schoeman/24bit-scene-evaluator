@@ -1,13 +1,12 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEditor;
+﻿#if (UNITY_EDITOR)
+namespace Tools
+{
+    using System.Collections.Generic;
+    using UnityEngine;
 
-#if (UNITY_EDITOR)
-namespace Tools {
     public class TextureDimensionCriteria : CriteriaBase
     {
-        public int textureDimension;
+        public int TextureDimension { get; set; }
 
         public override System.Tuple<object, Object> GetValue(GameObject gameObject)
         {
@@ -17,7 +16,7 @@ namespace Tools {
                 {
                     Texture texture = obj as Texture;
                     // We check whether the width or hight is the highest, and use the higher value
-                    return new System.Tuple<object, Object> (Mathf.Max(texture.width, texture.height), texture);
+                    return new System.Tuple<object, Object>(Mathf.Max(texture.width, texture.height), texture);
                 }
             }
             return new System.Tuple<object, Object>(-1, null);
@@ -30,15 +29,11 @@ namespace Tools {
             Texture texture = value.Item2 as Texture;
             int biggestDimension = (int)value.Item1;
 
-            bool result;
             // Validate the values
-            if (biggestDimension > textureDimension)
-                result = false;
-            else
-                result = true;
+            bool result = biggestDimension <= TextureDimension;
 
-            //add a validation error if nessisary
-            if (errors != null && !result) errors.Add($"{texture.name} {texture.width}x{texture.height} Texture dimentions exceeds {textureDimension}");
+            // Add a validation error if nessisary
+            if (errors != null && !result) errors.Add($"{texture.name} {texture.width}x{texture.height} Texture dimentions exceeds {TextureDimension}");
 
             return result;
         }

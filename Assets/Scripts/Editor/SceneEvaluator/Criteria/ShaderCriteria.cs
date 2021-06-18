@@ -1,14 +1,13 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEditor;
+﻿#if (UNITY_EDITOR)
+namespace Tools
+{
+    using System.Collections.Generic;
+    using UnityEngine;
 
-#if (UNITY_EDITOR)
-namespace Tools {
     public class ShaderCriteria : CriteriaBase
     {
-        public int shaderIndex;
-        public string shaderName;
+        public int ShaderIndex { get; set; }
+        public string ShaderName { get; set; }
 
         public override System.Tuple<object, Object> GetValue(GameObject gameObject)
         {
@@ -18,7 +17,7 @@ namespace Tools {
                 {
                     Shader shader = obj as Shader;
                     // We get the shader name
-                    return new System.Tuple<object, Object> (shader.name, shader);
+                    return new System.Tuple<object, Object>(shader.name, shader);
                 }
             }
             return new System.Tuple<object, Object>("", null);
@@ -30,15 +29,11 @@ namespace Tools {
             System.Tuple<object, Object> value = GetValue(gameObject);
             Shader shader = value.Item2 as Shader;
 
-            bool result;
             // Validate the values
-            if (shader.name == shaderName) 
-                result = false;
-            else
-                result = true;
+            bool result = shader?.name != ShaderName;
 
-            //add a validation error if nessisary
-            if (errors != null && !result) errors.Add($"Found {shaderName} shader on {gameObject.name}");
+            // Add a validation error if nessisary
+            if (errors != null && !result) errors.Add($"Found {ShaderName} shader on {gameObject.name}");
 
             return result;
         }

@@ -1,13 +1,12 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEditor;
+﻿#if (UNITY_EDITOR)
+namespace Tools
+{
+    using System.Collections.Generic;
+    using UnityEngine;
 
-#if (UNITY_EDITOR)
-namespace Tools {
     public class VertexCountCriteria : CriteriaBase
     {
-        public int vertexCountValue;
+        public int VertexCountValue { get; set; }
 
         public override System.Tuple<object, Object> GetValue(GameObject gameObject)
         {
@@ -30,15 +29,11 @@ namespace Tools {
             Mesh mesh = value.Item2 as Mesh;
             int vertexCount = (int)value.Item1;
 
-            bool result;
             // Validate the values
-            if (vertexCount > vertexCountValue)
-                result = false;
-            else
-                result = true;
+            bool result = vertexCount <= VertexCountValue;
 
-            //add a validation error if nessisary
-            if (errors != null && !result) errors.Add($"{gameObject.name} - {mesh.name} - Vertex count of {vertexCount} exceeds {vertexCountValue}");
+            // Add a validation error if nessisary
+            if (errors != null && !result) errors.Add($"{gameObject.name} - {mesh.name} - Vertex count of {vertexCount} exceeds {VertexCountValue}");
 
             return result;
         }

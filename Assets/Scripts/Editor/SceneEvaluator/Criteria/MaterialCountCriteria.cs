@@ -1,13 +1,12 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEditor;
+﻿#if (UNITY_EDITOR)
+namespace Tools
+{
+    using System.Collections.Generic;
+    using UnityEngine;
 
-#if (UNITY_EDITOR)
-namespace Tools {
     public class MaterialCountCriteria : CriteriaBase
     {
-        public int materialCountValue = 1;
+        public int MaterialCountValue { get; set; } = 1;
 
         public override System.Tuple<object, Object> GetValue(GameObject gameObject)
         {
@@ -30,14 +29,10 @@ namespace Tools {
             System.Tuple<object, Object> value = GetValue(gameObject);
             int materialCount = (int)value.Item1;
 
-            bool result;
             // Validate the values
-            if (materialCount > materialCountValue)
-                result = false;
-            else
-                result = true;
+            bool result = materialCount <= MaterialCountValue;
 
-            //add a validation error if nessisary
+            // Add a validation error if nessisary
             if (errors != null && !result) errors.Add($"{gameObject.name} Has {materialCount} materials assigned");
 
             return result;

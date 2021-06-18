@@ -1,13 +1,10 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEditor;
-using UnityEditor.SceneManagement;
-using System.Linq;
-
-#if (UNITY_EDITOR)
+﻿#if (UNITY_EDITOR)
 namespace Tools
 {
+    using System.Collections.Generic;
+    using UnityEditor;
+    using UnityEngine;
+
     public abstract class CriteriaBase : ICriteria
     {
         /// <summary>
@@ -57,7 +54,7 @@ namespace Tools
                         CollectDependanciesRecursive(property.objectReferenceValue, componentTypes, dependencies);
                     }
                 }
-            };
+            }
 
             return dependencies;
         }

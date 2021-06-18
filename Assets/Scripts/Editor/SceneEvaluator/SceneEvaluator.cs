@@ -1,38 +1,38 @@
-﻿using System;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEditor;
-using System.Linq;
-using UnityEditor.SceneManagement;
-
-#if (UNITY_EDITOR)
+﻿#if (UNITY_EDITOR)
 namespace Tools
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using UnityEditor;
+    using UnityEditor.SceneManagement;
+    using UnityEngine;
+
     public class SceneEvaluator : EditorWindow
     {
-        private int tabIndex = -1;
-        private CategoryTabBase activeTab;
-        private static SortedList<string, System.Type> tabs = new SortedList<string, System.Type>();
+        private int _tabIndex = -1;
+        private CategoryTabBase _activeTab;
+        private static SortedList<string, System.Type> _tabs = new SortedList<string, System.Type>();
 
-        private Vector2 scroll = Vector2.zero;
-        private static SceneEvaluator window;
+        private Vector2 _scroll = Vector2.zero;
+        private static SceneEvaluator s_window;
 
         // Add menu named "SceneEvaluator" to the Window menu
         [MenuItem("24Bit Tools/SceneEvaluator %e")] //Hotkey is Ctrl-E
-        static void Init()
+        public static void Init()
         {
             // Get existing open window or if none, make a new one:
-            window = EditorWindow.GetWindow<SceneEvaluator>("Scene Evaluator");
-            window.Show();
+            s_window = EditorWindow.GetWindow<SceneEvaluator>("Scene Evaluator");
+            s_window.Show();
         }
 
-        void OnEnable()
+        private void OnEnable()
         {
             // When the window is enabled we check for any classes that has the IcategoryTab interface
-            FindControllers<ICategoryTab, CategoryTabBase>(ref tabs);
+            FindControllers<ICategoryTab, CategoryTabBase>(ref _tabs);
         }
 
-        static void FindControllers<I, T>(ref SortedList<string, Type> collection)
+        private static void FindControllers<I, T>(ref SortedList<string, Type> collection)
         {
             try
             {
@@ -56,16 +56,16 @@ namespace Tools
             }
         }
 
-        void OnGUI()
+        private void OnGUI()
         {
             EditorGUILayout.LabelField("Scene Evaluator", EditorStyles.boldLabel);
 
             // We display the tabs and create a instance of the category tab controller when a tab is selected
             EditorGUI.BeginChangeCheck();
-            tabIndex = GUILayout.SelectionGrid(tabIndex, tabs.Keys.ToArray<string>(), tabs.Count);
+            _tabIndex = GUILayout.SelectionGrid(_tabIndex, _tabs.Keys.ToArray<string>(), _tabs.Count);
             if (EditorGUI.EndChangeCheck())
             {
-                activeTab = System.Activator.CreateInstance(tabs.Values[tabIndex]) as CategoryTabBase;
+                _activeTab = System.Activator.CreateInstance(_tabs.Values[_tabIndex]) as CategoryTabBase;
             }
 
             // Button to export criteria values for select game objects
@@ -74,19 +74,18 @@ namespace Tools
                 ExportToCSV();
             }
 
-            if (activeTab != null)
+            if (_activeTab != null)
             {
-
                 // We draw the tab controller's GUI items first
-                activeTab.Draw();
+                _activeTab.Draw();
 
                 // Then we draw the individual items that failed the validation check
-                scroll = EditorGUILayout.BeginScrollView(scroll, EditorStyles.helpBox);
-                for (int i = 0; i < activeTab.criteriaMatches.Count; i++)
+                _scroll = EditorGUILayout.BeginScrollView(_scroll, EditorStyles.helpBox);
+                for (int i = 0; i < _activeTab.CriteriaMatches.Count; i++)
                 {
-                    ListEntry entry = activeTab.criteriaMatches[i];
+                    ListEntry entry = _activeTab.CriteriaMatches[i];
                     entry.foldout = EditorGUILayout.BeginFoldoutHeaderGroup(entry.foldout, $"{entry.gameObject.name} (errors: {entry.validationErrors.Count})");
-                    activeTab.criteriaMatches[i] = entry;
+                    _activeTab.CriteriaMatches[i] = entry;
                     if (entry.foldout)
                     {
                         // Button to select the GameObject in the scene hierarchy
@@ -111,7 +110,7 @@ namespace Tools
         public void ExportToCSV()
         {
             // Let the user choose a name and directory
-            string path = EditorUtility.SaveFilePanel("Export Scene Evaluation", "", $"SceneEvaluation-{EditorSceneManager.GetActiveScene().name}-{System.DateTime.Now.ToShortDateString().Replace("/","-")}.csv", "csv");
+            string path = EditorUtility.SaveFilePanel("Export Scene Evaluation", "", $"SceneEvaluation-{EditorSceneManager.GetActiveScene().name}-{System.DateTime.Now.ToShortDateString().Replace("/", "-")}.csv", "csv");
 
             if (string.IsNullOrWhiteSpace(path)) return;
 
@@ -121,7 +120,7 @@ namespace Tools
             List<CriteriaBase> criterias = new List<CriteriaBase>();
 
             // Create a instance of each we can use
-            foreach (var criteriaType in criteriaTypes)
+            foreach (KeyValuePair<string, Type> criteriaType in criteriaTypes)
             {
                 criterias.Add(Activator.CreateInstance(criteriaType.Value) as CriteriaBase);
             }
@@ -129,14 +128,14 @@ namespace Tools
             // Setup the writer
             System.IO.StreamWriter sw = new System.IO.StreamWriter(path);
             // Write the header row
-            sw.WriteLine($"GameObject,{string.Join(",", criterias.Select(item => { return item.GetType().Name.Replace("Criteria", ""); }))}");
+            sw.WriteLine($"GameObject,{string.Join(",", criterias.Select(item => item.GetType().Name.Replace("Criteria", "")))}");
 
             foreach (GameObject item in Selection.objects)
             {
                 List<string> data = new List<string> { item.name };
 
                 // Run each criteria for each of the selected objects
-                foreach (var criteria in criterias)
+                foreach (CriteriaBase criteria in criterias)
                 {
                     string value = criteria.GetValue(item).Item1.ToString();
                     data.Add(value == "-1" || string.IsNullOrWhiteSpace(value) ? "NAN" : value);

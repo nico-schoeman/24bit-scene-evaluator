@@ -1,23 +1,23 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
-using UnityEditor;
-using UnityEditor.SceneManagement;
-using System.Linq;
-
-#if (UNITY_EDITOR)
+﻿#if (UNITY_EDITOR)
 namespace Tools
 {
+    using System.Collections.Generic;
+    using System.Linq;
+    using UnityEditor;
+    using UnityEditor.SceneManagement;
+    using UnityEngine;
+
     /// <summary>
     /// this is the base class for our catagories and it implements the shared functionality for the category tabs
     /// </summary>
     public abstract class CategoryTabBase : ICategoryTab
     {
-        public string Name
-        {
-            get { return this.GetType().Name.Replace("Tab", ""); }
-        }
+        public List<ListEntry> CriteriaMatches { get; set; } = new List<ListEntry>();
 
-        public List<ListEntry> criteriaMatches = new List<ListEntry>();
+        public string GetName()
+        {
+            return this.GetType().Name.Replace("Tab", "");
+        }
 
         /// <summary>
         /// This method is responsible to check the GameObjects in the scene against the criteria defined in the category controllers
@@ -29,12 +29,12 @@ namespace Tools
         /// </summary>
         public virtual void Draw()
         {
-            EditorGUILayout.LabelField(Name, EditorStyles.boldLabel);
+            EditorGUILayout.LabelField(GetName(), EditorStyles.boldLabel);
             if (GUILayout.Button("Scan"))
             {
                 Scan();
                 // After the validation scan we select the GameObjects that failed the checks
-                Selection.objects = criteriaMatches.Select<ListEntry, GameObject>(match => { return match.gameObject; }).ToArray();
+                Selection.objects = CriteriaMatches.Select<ListEntry, GameObject>(match => match.gameObject).ToArray();
             }
         }
 
@@ -56,14 +56,14 @@ namespace Tools
         /// <param name="errors"></param>
         public void AddCriteriaMatch(GameObject gameObject, List<string> errors)
         {
-            if (criteriaMatches.Any(match => match.gameObject == gameObject))
+            if (CriteriaMatches.Any(match => match.gameObject == gameObject))
             {
-                ListEntry entry = criteriaMatches.Single(match => match.gameObject == gameObject);
+                ListEntry entry = CriteriaMatches.Single(match => match.gameObject == gameObject);
                 entry.validationErrors = entry.validationErrors.Union(errors).ToList();
             }
             else
             {
-                criteriaMatches.Add(new ListEntry() { gameObject = gameObject, validationErrors = errors });
+                CriteriaMatches.Add(new ListEntry() { gameObject = gameObject, validationErrors = errors });
             }
         }
     }
